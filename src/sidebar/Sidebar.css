@@ -1,0 +1,52 @@
+.sidebar {
+  flex: 0.35; /* it take 35% area of wedth */
+  background-color: #fff;
+}
+
+.sidebar_header {
+  display: flex;
+  justify-content: space-between;
+  border-radius: 1px solid lightgray;
+  padding: 10px;
+  background-color: #ededed;
+}
+
+.sidebar_header_right {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 10vw;
+}
+.sidebar_header_right svg {
+  font-size: 18px; /* in the sidebar_header_right contained all svg icon goes font size decrease 18px */
+}
+
+.sidebar_search {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f6f6f6;
+  height: 40px;
+  padding: 10px;
+}
+.sidebar_search_container {
+  display: flex;
+  background-color: #fff;
+  /* height: 35px; */
+  align-items: center;
+  border-radius: 20px;
+  width: 100%;
+}
+
+.sidebar_search_container input {
+  border: 0;
+  margin-left: 10px;
+  outline: 0;
+  /* width: 100%; */
+}
+
+.sidebar_chats {
+  display: flex;
+  background-color: #fff;
+  flex-direction: column;
+}

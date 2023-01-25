@@ -1,0 +1,96 @@
+.chat {
+  flex: 0.65;
+  display: flex; /* 1st part 57.34 */
+  flex-direction: column;
+}
+
+.chat .chat_header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid lightgray;
+  padding: 10px;
+}
+
+.chat_header_info {
+  flex: 1; /* it takse all the space in all direction dirction which is empty and chat right part div goes to end */
+  padding: 9px;
+}
+.chat_header_info h3 {
+  font-size: 16px;
+}
+.chat_header_info p {
+  font-size: 12px;
+}
+
+.chat_header_right {
+  display: flex;
+  align-items: center;
+}
+.chat_header_right svg {
+  font-size: 18px;
+}
+
+/* chat body css */
+.chat_body {
+  /* 1st part 57.34 */
+  flex: 1;
+  background-image: url("../image/whatsApp-Chat_background.jpg");
+  padding: 25px 10px; /* 1st 25px give padding top and buttom and 2nd 10px give pading left right in chat body */
+  overflow-y: auto; /* when chat is increase this create the over flow and give a scrollbar only verticaly */
+}
+
+.chat_body .chat_message {
+  position: relative;
+  margin-bottom: 30px;
+  padding: 5px;
+  width: fit-content;
+  background-color: #fff;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.chat_name {
+  position: absolute;
+  top: -18px;
+  left: 5px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.chat_time {
+  font-size: 10px;
+  margin-left: 10px;
+}
+
+/* for the chat receiver we giv e the css */
+.chat_receiver {
+  background-color: #d6f8c6 !important;
+  margin-left: auto;
+}
+
+/* chat footer part css */
+.chat_footer {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+.chat_footer svg {
+  padding: 10px;
+  color: gray;
+}
+
+.chat_footer form {
+  flex: 1;
+}
+
+.chat_footer form input[type="text"] {
+  height: 40px;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  border-radius: 8px;
+}
+
+.chat_footer form input[type="submit"] {
+  display: none;
+}
