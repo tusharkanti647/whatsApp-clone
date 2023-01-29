@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 
 import "./Sidebar.css"
 import SidebarChats from "./SidebarChats"
@@ -9,7 +11,35 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SearchIcon from '@mui/icons-material/Search';
 import { Icon, IconButton } from '@mui/material';
 
+import { collection, getDocs } from "firebase/firestore";
+
+import { db } from "../firebas";
+import { async } from "@firebase/util";
+
+
+
 function Sidebar() {
+
+    const [rooms, setRooms] = useState([]);
+
+
+    const getRooms = async () => {
+        const querySnapshot = await getDocs(collection(db, "rooms"));
+        const newArr = [];
+        querySnapshot.forEach((doc) => {
+            newArr.push({
+                id: doc.id,
+                ...doc.data(),
+            });
+        });
+        setRooms(newArr);
+    }
+
+    useEffect(() => {
+        getRooms();
+    }, []);
+
+
     return (
         <>
             {/* className sidebar is the main containar in left side div */}
@@ -20,7 +50,7 @@ function Sidebar() {
                     <IconButton >
                         <Avatar />
                     </IconButton>
-                    
+
                     {/* classname sidebar_header_right this sidebar heder right part which contains alll icon */}
                     <div className="sidebar_header_right">
 
@@ -54,12 +84,10 @@ function Sidebar() {
                 <div className="sidebar_chats">
 
                     {/* send props addNewChat and render 1st component is add new chat */}
-                    <SidebarChats addNewChat />
-
-                    <SidebarChats />
-                    <SidebarChats />
-                    <SidebarChats />
-                    <SidebarChats />
+                    <SidebarChats addNewChat={true} />
+                    {/* <SidebarChats name="tushar" id="1234" /> // */}
+                    
+                    {rooms.map((room)=><SidebarChats key={room.id} name={room.name} id={room.id} />)}
                 </div>
             </div>
         </>
