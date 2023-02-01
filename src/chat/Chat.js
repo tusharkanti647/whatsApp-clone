@@ -12,7 +12,7 @@ import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import { useParams } from "react-router-dom";
 
 import { addDoc, collection, doc, onSnapshot, orderBy, query, serverTimestamp } from "firebase/firestore";
-import { db } from "../firebas";
+import { db } from "../firebase";
 import { async } from "@firebase/util";
 
 

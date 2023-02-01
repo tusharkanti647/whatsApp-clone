@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import "./Sidebar.css"
 import SidebarChats from "./SidebarChats"
-import { db } from "../firebas";
+import { db } from "../firebase";
 
 
 import { collection, onSnapshot } from "firebase/firestore";
@@ -21,8 +21,8 @@ import { Icon, IconButton } from '@mui/material';
 function Sidebar() {
 
     const [rooms, setRooms] = useState([]);
-   
- 
+
+
 
 
     const getRooms = async () => {
@@ -85,7 +85,7 @@ function Sidebar() {
                 </div>
 
                 <div className="sidebar_chats">
-                
+
                     {/* send props addNewChat and render 1st component is add new chat */}
                     <SidebarChats addNewChat={true} />
                     {/* <SidebarChats name="tushar" id="1234" /> // */}

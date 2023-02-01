@@ -1,46 +1,112 @@
-import { createContext, useContext, useReducer } from "react";
+
+import React, { useState } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+} from "react-router-dom";
 import './App.css';
-import {  StateProvider, useStateValue } from "./StateContext";
-
-import reducer, { initialState } from './reducer';
-import Sidebar from "./sidebar/Sidebar"
-import Chat from "./chat/Chat"
-//import { db } from "./firebas";
+import Chat from "./chat/Chat";
 import Login from './login/Login.js';
+import Sidebar from "./sidebar/Sidebar"
+import { useStateValue } from "./StateProvider";
+
+// import reducer, { initialState } from './reducer';
+
+//import { BrowserRouter, Routes, Route } from "react-router-dom";
+// //import { db } from "./firebas";
 
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+/*
+import React, { useState } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+} from "react-router-dom";
+import './App.css';
+import Chat from './Chat';
+import Login from './Login';
+import Sidebar from './Sidebar';
+import { useStateValue } from './StateProvider';
+*/
+
+
 
 function App() {
-  const {user} = useStateValue(); 
-  console.log(useStateValue());
-
+  //   // const {user} = useStateValue(); 
+  //   // console.log(useStateValue());
+  const [{ user }, dispath] = useStateValue();
 
 
 
   return (
-    <BrowserRouter>
-      <StateProvider>
-        {/* {console.log(reducer)} */}
-        {/* <StateContext.Provider value={useReducer( initialState,reducer)}>  <Login />   */}
-        <div className="app">
-        
-          {!user ? (<Login />) : (
-            
-            <div className='app_body'>
+
+
+
+
+    <div className="app">
+
+      {!user ? (<Login />) : (
+
+        <div className='app_body'>
+          <Router>
+
+            <Sidebar />
+            <Switch>
               
-              <Sidebar />
-              <Routes>
-                <Route path='/' element={<Chat />}></Route>
-                <Route path='/room/:roomId' element={<Chat />}></Route>
-              </Routes>
-            </div>
-          )}
+              <Route path='/room/:roomId'>
+                <Chat />
+              </Route>
+
+              <Route path='/'>
+                <Chat />
+              </Route>
+
+            </Switch>
+          </Router>
         </div>
-      </StateProvider>
-      {/* </StateContext.Provider> */}
-    </BrowserRouter >
+      )}
+    </div>
+  )
+}
+
+export default App;
+
+/*
+
+function App() {
+
+  const [{ user }, dispath] = useStateValue();
+
+  return (
+    // BEM naming convention
+    <div className="App">
+      {!user ? (
+        <Login />
+      ) : (
+        <div className='app_body'>
+          <Router>
+
+            <Sidebar />
+
+            <Switch>
+              <Route path='/rooms/:roomId'>
+                <Chat />
+              </Route>
+
+              <Route path="/">
+                <Chat />
+              </Route>
+
+            </Switch>
+          </Router>
+        </div>
+      )}
+    </div>
   );
 }
 
 export default App;
+
+*/

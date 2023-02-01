@@ -4,7 +4,7 @@ import "./SidebarChats.css"
 import { Avatar } from "@mui/material";
 
 import { collection, addDoc, orderBy, query, onSnapshot } from "firebase/firestore";
-import { db } from "../firebas";
+import { db } from "../firebase";
 
 import { Link } from "react-router-dom";
 
