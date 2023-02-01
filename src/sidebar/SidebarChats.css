@@ -26,8 +26,12 @@
   cursor: pointer;
 }
 
-.sidebar_chat .avatar{
-width: 30px;
-height: 30px;
+.sidebar_chat .avatar {
+  width: 30px;
+  height: 30px;
 }
 
+a {
+  text-decoration: none;
+  color: black; /* this do after the adding colore change to blue and decoration add so it remove , here ancer tag is link tag */
+}
