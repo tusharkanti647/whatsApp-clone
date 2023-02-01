@@ -1,7 +1,7 @@
 
 
 export const initialState={
-user: null,
+user: "abc",
 }
 
 const reducer=(state, action)=>{

@@ -3,7 +3,7 @@ import reducer, { initialState } from "../reducer";
 import image from "../image/WhatsApp-logo.png"
 import { auth, provider } from "../firebas"
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { useReducer } from "react";
+import useReducer from "react";
 
 
 
