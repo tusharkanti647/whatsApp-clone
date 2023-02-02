@@ -40,6 +40,10 @@ function SidebarChats(props) {
                 console.error("Error adding document: ", e);
             }
         }
+
+        // return ()=>{
+        
+        // }
     }
 
     return (

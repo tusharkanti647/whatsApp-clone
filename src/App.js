@@ -1,10 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-} from "react-router-dom";
+
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './App.css';
 import Chat from "./chat/Chat";
 import { auth } from './firebase';
@@ -18,19 +15,7 @@ import { useStateValue } from "./StateProvider";
 // //import { db } from "./firebas";
 
 
-/*
-import React, { useState } from 'react';
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-} from "react-router-dom";
-import './App.css';
-import Chat from './Chat';
-import Login from './Login';
-import Sidebar from './Sidebar';
-import { useStateValue } from './StateProvider';
-*/
+
 
 
 
@@ -39,7 +24,7 @@ function App() {
   //   // console.log(useStateValue());
   const [{ user }, dispath] = useStateValue();
 
-
+  console.log(user);
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       dispath({
@@ -47,76 +32,39 @@ function App() {
         user: user
       })
     })
-  })
+  }, [])
 
 
   return (
 
 
 
+    <BrowserRouter>
+      <div className="app">
 
-    <div className="app">
+        {!user ? (<Login />) : (
 
-      {!user ? (<Login />) : (
+          <div className='app_body'>
 
-        <div className='app_body'>
-          <Router>
 
             <Sidebar />
-            <Switch>
+            <Routes>
 
-              <Route path='/room/:roomId'>
-                <Chat />
+              <Route path='/' element={<Chat />}>
+                
               </Route>
 
-              <Route path='/'>
-                <Chat />
+              <Route path='/room/:roomId' element={<Chat />}>
+                
               </Route>
 
-            </Switch>
-          </Router>
-        </div>
-      )}
-    </div>
+            </Routes>
+          </div>
+
+        )}
+      </div>
+    </BrowserRouter>
   )
 }
 
 export default App;
-
-/*
-
-function App() {
-
-  const [{ user }, dispath] = useStateValue();
-
-  return (
-    // BEM naming convention
-    <div className="App">
-      {!user ? (
-        <Login />
-      ) : (
-        <div className='app_body'>
-          <Router>
-
-            <Sidebar />
-
-            <Switch>
-              <Route path='/rooms/:roomId'>
-                <Chat />
-              </Route>
-
-              <Route path="/">
-                <Chat />
-              </Route>
-
-            </Switch>
-          </Router>
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default App;
-
-*/

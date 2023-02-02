@@ -15,7 +15,7 @@ import DonutLargeIcon from '@mui/icons-material/DonutLarge';
 import ChatIcon from '@mui/icons-material/Chat';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SearchIcon from '@mui/icons-material/Search';
-import { Icon, IconButton } from '@mui/material';
+import { IconButton } from '@mui/material';//Icon
 import { useStateValue } from "../StateProvider";
 
 
@@ -26,9 +26,9 @@ function Sidebar() {
 
     const [rooms, setRooms] = useState([]);
 
-    const [{user}, dispath] = useStateValue();
+    const [{ user }, dispath] = useStateValue();
 
-//console.log(user);
+    //console.log(user);
     const getRooms = async () => {
         const getData = onSnapshot(collection(db, "rooms"), (snapshot) => {
             const newArr = [];
@@ -54,9 +54,9 @@ function Sidebar() {
 
                 <div className="sidebar_header">
                     {/* IconButton component is a inbuild component in the material ui that frovied button like fitures */}
-                    <IconButton >
-                        <Avatar src={user?.photoURL} onClick={()=>signOut(auth)}/>
-                    </IconButton>
+                    {/* <IconButton > */}
+                    <Avatar src={user?.photoURL} onClick={() => signOut(auth)} />
+                    {/* </IconButton> */}
 
                     {/* classname sidebar_header_right this sidebar heder right part which contains alll icon */}
                     <div className="sidebar_header_right">

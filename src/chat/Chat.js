@@ -41,7 +41,9 @@ function Chat() {
         // that time change the roomId, that used get the roome name and set in setroome name
         if (roomId) {
             const getRoomData = onSnapshot(doc(db, "rooms", roomId), (doc) => {
+                console.log(doc.data());
                 setRoomName(doc.data().name);
+                
             })
 
             //get all themessge by the time odering of time when chnge the roome or roomId
@@ -121,30 +123,6 @@ function Chat() {
                 ))}
 
                 {/* <p className="chat_message chat_receiver">
-                    <span className="chat_name">Tushar</span>
-                    this is test messge .....
-                    <span className="chat_time">9:31 AM</span>
-                </p>
-
-                <p className="chat_message">
-                    <span className="chat_name">Tushar</span>
-                    this is test messge .....
-                    <span className="chat_time">9:31 AM</span>
-                </p>
-
-                <p className="chat_message chat_receiver">
-                    <span className="chat_name">Tushar</span>
-                    this is test messge .....
-                    <span className="chat_time">9:31 AM</span>
-                </p>
-
-                <p className="chat_message chat_receiver">
-                    <span className="chat_name">Tushar</span>
-                    this is test messge .....
-                    <span className="chat_time">9:31 AM</span>
-                </p>
-
-                <p className="chat_message">
                     <span className="chat_name">Tushar</span>
                     this is test messge .....
                     <span className="chat_time">9:31 AM</span>
