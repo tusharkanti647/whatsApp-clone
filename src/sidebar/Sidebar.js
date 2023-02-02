@@ -6,6 +6,8 @@ import { db } from "../firebase";
 
 
 import { collection, onSnapshot } from "firebase/firestore";
+import { signOut } from "firebase/auth";
+import { auth } from '../firebase';
 
 
 import Avatar from '@mui/material/Avatar';
@@ -14,6 +16,8 @@ import ChatIcon from '@mui/icons-material/Chat';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SearchIcon from '@mui/icons-material/Search';
 import { Icon, IconButton } from '@mui/material';
+import { useStateValue } from "../StateProvider";
+
 
 
 
@@ -22,9 +26,9 @@ function Sidebar() {
 
     const [rooms, setRooms] = useState([]);
 
+    const [{user}, dispath] = useStateValue();
 
-
-
+//console.log(user);
     const getRooms = async () => {
         const getData = onSnapshot(collection(db, "rooms"), (snapshot) => {
             const newArr = [];
@@ -51,7 +55,7 @@ function Sidebar() {
                 <div className="sidebar_header">
                     {/* IconButton component is a inbuild component in the material ui that frovied button like fitures */}
                     <IconButton >
-                        <Avatar />
+                        <Avatar src={user?.photoURL} onClick={()=>signOut(auth)}/>
                     </IconButton>
 
                     {/* classname sidebar_header_right this sidebar heder right part which contains alll icon */}
@@ -70,6 +74,7 @@ function Sidebar() {
                         </IconButton>
 
                     </div>
+                    {/* {console.log(user.photoURL)} */}
                 </div>
 
                 <div className='sidebar_search'>

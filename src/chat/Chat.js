@@ -14,12 +14,15 @@ import { useParams } from "react-router-dom";
 import { addDoc, collection, doc, onSnapshot, orderBy, query, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
 import { async } from "@firebase/util";
+import { useStateValue } from "../StateProvider";
 
 
 function Chat() {
     const [roomeName, setRoomName] = useState("");
     const [inputMessage, setInputMessage] = useState("");
     const [messageArray, setMessageArray] = useState([]);
+
+    const [{user}, dispath] = useStateValue();
 
     //useParams used to get the roomId , when roome is change
     const { roomId } = useParams();
@@ -67,7 +70,7 @@ function Chat() {
         try {
             const sendData = await addDoc(collection(db, "rooms", roomId, "messages"), {
                 message: { inputMessage },
-                name: "ram",
+                name: user.displayName,
                 timestam: serverTimestamp(),
             })
         } catch (e) {
@@ -106,7 +109,7 @@ function Chat() {
             <div className="chat_body">
 
                 {messageArray.map((eachMessageObj, index) => (
-                    <p className={`chat_message ${eachMessageObj.name === "tushar" && "chat_receiver"}`} key={eachMessageObj.timestam} >
+                    <p className={`chat_message ${eachMessageObj.name === user.displayName && "chat_receiver"}`} key={eachMessageObj.timestam} >
 
                         <span className="chat_name">{eachMessageObj.name}</span>
 
