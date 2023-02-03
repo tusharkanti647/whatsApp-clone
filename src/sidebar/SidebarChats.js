@@ -12,7 +12,12 @@ import { Link } from "react-router-dom";
 function SidebarChats(props) {
     const { addNewChat, name, id } = props;
     const [lastMessage, setLastMessage] = useState("");
+    const [svgId, setSvgId]=useState("");
     //console.log(props);
+
+    useEffect(() => {
+        setSvgId(Math.floor(Math.random() * 5000));
+    }, []);
 
     useEffect(() => {
         //this function runs when room change re render the room
@@ -28,6 +33,8 @@ function SidebarChats(props) {
         }
     }, [id]);
 
+    //create and add a group
+    //---------------------------------------------------------
     const createChat = async () => {
         const group = prompt("plese enter your group name");
         if (group) {
@@ -40,17 +47,17 @@ function SidebarChats(props) {
                 console.error("Error adding document: ", e);
             }
         }
-
-        // return ()=>{
-        
-        // }
     }
+
+    //create and add a friend
+    //---------------------------------------------------------
+
 
     return (
         !addNewChat ? (
             <Link to={`room/${id}`}>
                 <div className="sidebar_chat">
-                    <Avatar className="avatar" />
+                    <Avatar src={`https://avatars.dicebear.com/api/human/${svgId}.svg`} className="avatar" />
                     <div className="sidebar_chat_info">
                         <h2>{name}</h2>
                         <p>{lastMessage}</p>

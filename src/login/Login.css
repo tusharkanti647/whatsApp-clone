@@ -16,10 +16,10 @@
   text-align: center;
 }
 
-h2 {
+.login h2 {
   margin: 20px;
 }
-button {
+.login button {
   background-color: #3fc350;
   color: #fff;
   border: 0px;

@@ -1,32 +1,16 @@
 import { createContext, useContext, useReducer } from "react";
 
-
+//create createContext function for the context API
 export const StateContext = createContext()
 
+//create stateProvider for the Context API
 export const StateProvider = ({ reducer, initialState, children }) => (
-   //     const [state, dispatch] = useReducer(reducer, initialState);
-
-   <StateContext.Provider value={useReducer(reducer, initialState)}>
-      {children}
-   </StateContext.Provider>
-);
-
-export const useStateValue = () => useContext(StateContext);
-
-// export {StateProvider, useStateValue}
-
-/*
-
-import React, { createContext, useContext, useReducer } from "react";
-
-export const StateContext = createContext();
-
-export const StateProvider = ({ reducer, initialState, children }) => (
-    <StateContext.Provider value={useReducer
-    (reducer, initialState)}>
+    //context API passes the two thinks the are initial State and dispatch method,
+    //they are come ushing reduser hook
+    <StateContext.Provider value={useReducer(reducer, initialState)}>
         {children}
     </StateContext.Provider>
 );
 
+//create a custom hook useStateValue
 export const useStateValue = () => useContext(StateContext);
-*/
