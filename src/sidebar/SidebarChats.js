@@ -13,6 +13,8 @@ function SidebarChats(props) {
     const { addNewChat, name, id, photoURL, setIsSearching, setSearchInputValue } = props;
     const [lastMessage, setLastMessage] = useState("");
     const [svgId, setSvgId] = useState("");
+    const [messageCount, setMessageCount] = useState(0);
+
     //console.log(props);
 
     let profilePhotoUrl = "";
@@ -46,12 +48,21 @@ function SidebarChats(props) {
 
                     snapshot.docs.forEach((doc) => setLastMessage(doc.data().message.inputMessage));
                 })
-            }else{
+            } else {
                 const q = query(collection(db, "chats", id, "messages"), orderBy("timestam", "asc"))//oder messge on timestamp and ascending oder give the asc
 
                 const getMessage = onSnapshot(q, (snapshot) => {
 
-                    snapshot.docs.forEach((doc) => setLastMessage(doc.data().message.inputMessage));
+                    snapshot.docs.forEach((doc) => {
+                        //console.log(doc.data());
+                        if (doc.data().isSeen === "false") {
+
+                            //console.log(doc.data().message.inputMessage);
+                            // setMessageCount(messageCount + 1);
+                            //console.log(messageCount);
+                        }
+                        setLastMessage(doc.data().message.inputMessage)
+                    });
                 })
             }
         }
@@ -85,6 +96,7 @@ function SidebarChats(props) {
         setIsSearching(false);
         setSearchInputValue("");
     }
+
     //--------------------------------------------------------------------
     return (
         !addNewChat ? (
@@ -95,6 +107,8 @@ function SidebarChats(props) {
                         <h2>{name}</h2>
                         <p>{lastMessage}</p>
                     </div>
+                    {/* <span>{}</span> */}
+                    {/* {console.log("hi")} */}
                 </div>
             </Link>
         ) : (

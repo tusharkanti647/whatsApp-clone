@@ -14,6 +14,7 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
+import SendIcon from '@mui/icons-material/Send';
 
 import { addDoc, collection, doc, getDoc, onSnapshot, orderBy, query, serverTimestamp, setDoc } from "firebase/firestore";
 
@@ -285,6 +286,9 @@ function Chat() {
 
                 <IconButton>
                     <KeyboardVoiceIcon />
+                </IconButton>
+                <IconButton>
+                    {inputMessage.length>0 && <SendIcon />}
                 </IconButton>
             </div>
         </div>
