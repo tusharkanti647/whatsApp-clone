@@ -29,3 +29,9 @@
   border-radius: 5px;
   cursor: pointer;
 }
+
+@media only screen and (max-width: 590px) {
+  .login>img{
+    width: 200px;
+  }
+}
