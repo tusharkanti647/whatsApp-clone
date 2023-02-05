@@ -7,29 +7,53 @@ import { collection, addDoc, orderBy, query, onSnapshot } from "firebase/firesto
 import { db } from "../firebase";
 
 import { Link } from "react-router-dom";
-
+//--------------------------------------------------------------------------------------
 
 function SidebarChats(props) {
-    const { addNewChat, name, id } = props;
+    const { addNewChat, name, id, photoURL, setIsSearching, setSearchInputValue } = props;
     const [lastMessage, setLastMessage] = useState("");
-    const [svgId, setSvgId]=useState("");
+    const [svgId, setSvgId] = useState("");
     //console.log(props);
+
+    let profilePhotoUrl = "";
+    let linkToUrl = "";
+    //--------------------------------------------------------------------------------
+
+    //set the profile Photo Url and link To Url
+    if (photoURL) {
+        profilePhotoUrl = photoURL;
+        linkToUrl = `room/${id}?group=${false}`
+    } else {
+        profilePhotoUrl = `https://avatars.dicebear.com/api/human/${svgId}.svg`;
+        linkToUrl = `room/${id}?group=${true}`
+    }
 
     useEffect(() => {
         setSvgId(Math.floor(Math.random() * 5000));
     }, []);
 
+    //------------------------------------------------------------------------
+
     useEffect(() => {
         //this function runs when room change re render the room
         // that time change the roomId, that used get the roome name and set in setroome name
         if (id) {
-            //get all themessge by the time odering of time when chnge the roome or roomId
-            const q = query(collection(db, "rooms", id, "messages"), orderBy("timestam", "asc"))//oder messge on timestamp and ascending oder give the asc
+            if (!photoURL) {
+                //get all themessge by the time odering of time when chnge the roome or roomId
+                const q = query(collection(db, "rooms", id, "messages"), orderBy("timestam", "asc"))//oder messge on timestamp and ascending oder give the asc
 
-            const getMessage = onSnapshot(q, (snapshot) => {
+                const getMessage = onSnapshot(q, (snapshot) => {
 
-                snapshot.docs.forEach((doc) => setLastMessage(doc.data().message.inputMessage));
-            })
+                    snapshot.docs.forEach((doc) => setLastMessage(doc.data().message.inputMessage));
+                })
+            }else{
+                const q = query(collection(db, "chats", id, "messages"), orderBy("timestam", "asc"))//oder messge on timestamp and ascending oder give the asc
+
+                const getMessage = onSnapshot(q, (snapshot) => {
+
+                    snapshot.docs.forEach((doc) => setLastMessage(doc.data().message.inputMessage));
+                })
+            }
         }
     }, [id]);
 
@@ -49,15 +73,24 @@ function SidebarChats(props) {
         }
     }
 
-    //create and add a friend
+
+
+    //searchreset this function clear the search input box,
+    //and set the state of isSearch is false so that all other chatBar render
     //---------------------------------------------------------
-
-
+    const searchReset = () => {
+        if (!photoURL) {
+            return;
+        }
+        setIsSearching(false);
+        setSearchInputValue("");
+    }
+    //--------------------------------------------------------------------
     return (
         !addNewChat ? (
-            <Link to={`room/${id}`}>
-                <div className="sidebar_chat">
-                    <Avatar src={`https://avatars.dicebear.com/api/human/${svgId}.svg`} className="avatar" />
+            <Link to={linkToUrl}>
+                <div className="sidebar_chat" onClick={searchReset}>
+                    <Avatar src={profilePhotoUrl} className="avatar" />
                     <div className="sidebar_chat_info">
                         <h2>{name}</h2>
                         <p>{lastMessage}</p>

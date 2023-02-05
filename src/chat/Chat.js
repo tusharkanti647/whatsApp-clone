@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 
 import "./Chat.css"
 import { db } from "../firebase";
@@ -15,7 +15,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 
-import { addDoc, collection, doc, onSnapshot, orderBy, query, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, onSnapshot, orderBy, query, serverTimestamp, setDoc } from "firebase/firestore";
 
 
 //-------------------------------------------------------------
@@ -24,11 +24,24 @@ function Chat() {
     const [inputMessage, setInputMessage] = useState("");
     const [messageArray, setMessageArray] = useState([]);
     const [svgId, setSvgId] = useState("");
+    const [newFriend, setNewFriend] = useState({
+        name: "",
+        photoUrl: "",
+        userUid: "",
+    });
+
 
     const [{ user }, dispath] = useStateValue();
 
+    const [searchParams, setSearchParams] = useSearchParams();
+
     //useParams used to get the roomId , when roome is change
     const { roomId } = useParams();
+    const group = searchParams.get('group');
+    let profilePhotoUrl = "";
+    //-------------------------------------------------------------------------------------------
+
+    //console.log(newFriend);
 
     //-------------------------------------------------------------
     //this useEffect to rendomly find svgId number
@@ -36,31 +49,78 @@ function Chat() {
         setSvgId(Math.floor(Math.random() * 5000));
     }, []);
 
+    if (group === "true") {
+        profilePhotoUrl = `https://avatars.dicebear.com/api/human/${svgId}.svg`;
+    } else {
+        profilePhotoUrl = newFriend.photoUrl;
+    }
+
 
     //-------------------------------------------------------------
     useEffect(() => {
+        //const group = searchParams.get('group');
+
         //this function runs when room change re render the room
         // that time change the roomId, that used get the roome name and set in setroome name
         if (roomId) {
-            const getRoomData = onSnapshot(doc(db, "rooms", roomId), (doc) => {
-                console.log(doc.data());
-                setRoomName(doc.data().name);
+            if (group === "true") {
+                const getRoomData = onSnapshot(doc(db, "rooms", roomId), (doc) => {
+                    //console.log(doc.data());
+                    setRoomName(doc.data().name);
 
-            })
+                })
 
-            //get all the messge by the time odaring of time when change the roome or roomId
-            const q = query(collection(db, "rooms", roomId, "messages"), orderBy("timestam", "asc"))//oder messge on timestamp and ascending oder give the asc
+                //get all the messge by the time odaring of time when change the roome or roomId
+                const q = query(collection(db, "rooms", roomId, "messages"), orderBy("timestam", "asc"))//oder messge on timestamp and ascending oder give the asc
 
-            //set the each room messages in the newMessageArray
-            const getMessage = onSnapshot(q, (snapshot) => {
-                let newMessageArray = [];
-                snapshot.docs.forEach((doc) => newMessageArray.push({ ...doc.data() }));
+                //set the each room messages in the newMessageArray
+                const getMessage = onSnapshot(q, (snapshot) => {
+                    let newMessageArray = [];
+                    snapshot.docs.forEach((doc) => newMessageArray.push({ ...doc.data() }));
 
-                setMessageArray(newMessageArray);
-            })
+                    setMessageArray(newMessageArray);
+                })
+            } else {
+                //console.log(roomId,newFriend);
+                //get the chating friend data from firbase
+                const getRoomData = onSnapshot(doc(db, "users", roomId), (doc) => {
+                    //console.log(doc.data());
+                    setRoomName(doc.data().name);
+                    setNewFriend({
+                        name: doc.data().name,
+                        photoUrl: doc.data().photoUrl,
+                        userUid: doc.data().userUid,
+                    });
+                });
+                //------------------------------------------------------------------------------
+
+
+                //const n = newFriend.userUid;
+                //geat all messges of the newfriend
+                //get all the messge by the time odaring of time when change the roome or roomId
+                const q = query(collection(db, "chats", roomId, "messages"), orderBy("timestam", "asc"))//oder messge on timestamp and ascending oder give the asc
+
+                //set the each room messages in the newMessageArray
+                const getMessage = onSnapshot(q, (snapshot) => {
+                    //let newMessageArray = [];
+                    let allMessages = snapshot.docs.map((doc) => doc.data());
+
+                    let newMessageArray = allMessages.filter((eachMessageObj) => (
+                        eachMessageObj.senderUserUid === (user.uid || roomId) ||
+                        eachMessageObj.receiverUserUid === (user.uid || roomId)
+                    ));
+
+                    //console.log(newMessageArray);
+                    setMessageArray(newMessageArray);
+                })
+
+
+
+            }
 
         }
     }, [roomId]); //here dependendency array used when roomId chsnge call the useeffect function
+
 
 
     //-----------------------------------------------------------------------
@@ -70,24 +130,85 @@ function Chat() {
     //hhere serverTimestamp functon set the time serverTime
     const sendMessage = async (event) => {
         event.preventDefault();
-        if (inputMessage === "") {
-            return;
-        }
+        if (roomId) {
+            if (inputMessage === "") {
+                return;
+            }
 
-        try {
-            const sendData = await addDoc(collection(db, "rooms", roomId, "messages"), {
-                message: { inputMessage },
-                name: user.displayName,
-                timestam: serverTimestamp(),
-            })
-        } catch (e) {
-            console.log("error", e);
-        }
+            if (group === "true") {
 
-        //after take the input value inputmessge creat empty
-        setInputMessage("");
+                try {
+                    const sendData = await addDoc(collection(db, "rooms", roomId, "messages"), {
+                        message: { inputMessage },
+                        senderUserUid: user.uid,
+                        name: user.displayName,
+                        timestam: serverTimestamp(),
+                    })
+                } catch (e) {
+                    console.log("error", e);
+                }
+            } else {
+
+                let payload = {
+                    //name: user.displayName,
+                    message: { inputMessage },
+                    senderUserUid: user.uid,
+                    receiverUserUid: newFriend.userUid,
+                    timestam: serverTimestamp(),
+                    //isSeen:"",
+                    //timeStamp: firebase.firestore.Timestamp.now(),
+                };
+
+                //messeage sender messge data
+                try {
+                    const sendData = await addDoc(collection(db, "chats", newFriend.userUid, "messages"), {
+                        ...payload,
+                        isSeen: "false",
+                    })
+                } catch (e) {
+                    console.log("error", e);
+                }
+
+                //messeage reciver messge data
+                try {
+                    const sendData = await addDoc(collection(db, "chats", user.uid, "messages"), {
+                        ...payload,
+                        isSeen: "true",
+                    })
+                } catch (e) {
+                    console.log("error", e);
+                }
+
+                //added friend in sender friendList
+                try {
+                    const sendData = await setDoc(doc(db, "Friendlist", user.uid, "list", newFriend.userUid), {
+                        name: newFriend.name,
+                        photoUrl: newFriend.photoUrl,
+                        userUid: newFriend.userUid,
+                        lastMessage: inputMessage,
+                    })
+                } catch (e) {
+                    console.log("error", e);
+                }
+
+                //added friend in resiver friendList
+                try {
+                    const sendData = await setDoc(doc(db, "Friendlist", newFriend.userUid, "list", user.uid), {
+                        name: user.displayName,
+                        photoUrl: user.photoURL,
+                        userUid: user.uid,
+                        lastMessage: inputMessage,
+                    })
+                } catch (e) {
+                    console.log("error", e);
+                }
+            }
+
+            //after take the input value inputmessge creat empty
+            setInputMessage("");
+        }
     }
-
+    //console.log(user);
 
     //----------------------------------------------------------------
     return (
@@ -96,7 +217,7 @@ function Chat() {
             {/* chat header on the part right  side of the chat chat header */}
             {/* ---------------------------------------------------------------- */}
             <div className="chat_header">
-                <Avatar src={`https://avatars.dicebear.com/api/human/${svgId}.svg`} />
+                <Avatar src={profilePhotoUrl} />
                 <div className="chat_header_info">
                     <h3>{roomeName}</h3>
                     <p>Last seen at{" "} {new Date(messageArray[messageArray.length - 1]?.timestam?.toDate()).toUTCString()}</p>
@@ -112,7 +233,7 @@ function Chat() {
                         <AttachFileIcon />
                     </IconButton>
                     <IconButton>
-                        <MoreVertIcon onClick={() => signOut(auth)} />
+                        <MoreVertIcon />
                     </IconButton>
                 </div>
             </div>
@@ -122,7 +243,9 @@ function Chat() {
             <div className="chat_body">
 
                 {messageArray.map((eachMessageObj, index) => (
-                    <p className={`chat_message ${eachMessageObj.name === user.displayName && "chat_receiver"}`} key={eachMessageObj.timestam} >
+                    // senderUserUid: user.uid
+
+                    <p className={`chat_message ${eachMessageObj.senderUserUid === user.uid && "chat_receiver"}`} key={eachMessageObj.timestam} >
 
                         <span className="chat_name">{eachMessageObj.name}</span>
 
@@ -131,6 +254,7 @@ function Chat() {
                             {new Date(eachMessageObj.timestam?.toDate()).toUTCString()}
                         </span>
                     </p>
+
                 ))}
 
                 {/* <p className="chat_message chat_receiver">

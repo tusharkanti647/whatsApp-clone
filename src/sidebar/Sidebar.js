@@ -5,7 +5,7 @@ import SidebarChats from "./SidebarChats"
 import { db } from "../firebase";
 
 
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, getDocs, onSnapshot, query, where } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { auth } from '../firebase';
 
@@ -25,9 +25,16 @@ import { useStateValue } from "../StateProvider";
 function Sidebar() {
 
     const [rooms, setRooms] = useState([]);
+    const [allUsers, setAllUsers] = useState([]);
+    const [friendList, setFriendList] = useState([]);
+    const [searchInputValue, setSearchInputValue] = useState("");
+    const [searchResultUsers, setSearchResultUsers] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
 
     const [{ user }, dispath] = useStateValue();
 
+    //get the all rooms form firstore and add in the rooms array
+    //---------------------------------------------------------------------------------------
     //console.log(user);
     const getRooms = async () => {
         const getData = onSnapshot(collection(db, "rooms"), (snapshot) => {
@@ -41,12 +48,121 @@ function Sidebar() {
             })
         })
     }
+    //---------------------------------------------------------------------------------------
 
+    //get all user from user collection
+    const getAllUsers = async () => {
+        const getData = onSnapshot(collection(db, "users"), (snapshot) => {
+            const newArr = [];
+            snapshot.docs.filter((doc) => {
+                //console.log(doc.id, user.userUid);
+                if (doc.id != user.uid) {
+                    newArr.push({
+                        id: doc.id,
+                        ...doc.data(),
+                    });
+                    setAllUsers(newArr);
+                }
+            })
+        })
+    }
+    //---------------------------------------------------------------------------------------
+
+    //get all friendList of current user from friendlist collection
+    const getAllFriendList = async () => {
+        const getData = onSnapshot(collection(db, "Friendlist", user.uid, "list"), (snapshot) => {
+            const newArr = [];
+            snapshot.docs.forEach((doc) => {
+                newArr.push({
+                    ...doc.data(),
+                });
+                setFriendList(newArr);
+            })
+        })
+    }
+
+    //---------------------------------------------------------------------------------------
     useEffect(() => {
         getRooms();
-    }, []);
+        getAllUsers();
+        getAllFriendList();
+    }, [searchInputValue]);
+    //console.log(rooms);
+    //console.log(allUsers);
+    //console.log(friendList);
 
 
+    //---------------------------------------------------------------------------------------
+    const searchedUser = allUsers.filter((user) => {
+        if (searchInputValue) {
+            if (
+                user.name.toLowerCase().includes(searchInputValue.toLowerCase())
+            ) {
+                return user;
+            }
+        }
+    });
+    //console.log(searchedUser);
+
+    //---------------------------------------------------------------------------------------
+    const searchItem = searchedUser.map((eachUser) => {
+        return (
+            <SidebarChats
+                key={eachUser.userUid}
+                name={eachUser.name}
+                id={eachUser.userUid}
+                photoURL={eachUser.photoUrl}
+                setIsSearching={setIsSearching}
+                setSearchInputValue={setSearchInputValue}
+            />
+        );
+    });
+
+
+     //---------------------------------------------------------------------------------------
+     const friendListItem = friendList.map((eachUser) => {
+        return (
+            <SidebarChats
+                key={eachUser.userUid}
+                name={eachUser.name}
+                id={eachUser.userUid}
+                photoURL={eachUser.photoUrl}
+                setIsSearching={setIsSearching}
+                setSearchInputValue={setSearchInputValue}
+            />
+        );
+    });
+    //---------------------------------------------------------------------------------------
+    // const searchHandel = (event) => {
+    //     setIsSearching(true);
+    //     if (event.target.value === "") {
+    //         setIsSearching(false);
+    //     }
+
+    //     setSearchInputValue(event.target.value);
+    //     //console.log(event.target.value);
+
+    //     const usersRef = collection(db, "users");
+    //     // Create a query against the collection.
+    //     const q = query(usersRef, where("name", "==", event.target.value));
+
+    //     if (event.target.value === user.displayName) {
+    //         return;
+    //     }
+    //     //console.log(q);
+    //     const getMessage = onSnapshot(q, (snapshot) => {
+    //         const newSearchResultUsersArray = []
+    //         snapshot.docs.forEach((doc) => {
+    //             newSearchResultUsersArray.push(doc.data());
+    //         });
+
+    //         setSearchResultUsers(newSearchResultUsersArray);
+    //     });
+    // }
+    //console.log(searchResultUsers);
+    //console.log(!searchResultUsers);
+
+    //---------------------------------------------------------------------------------------------
     return (
         <>
             {/* className sidebar is the main containar in left side div */}
@@ -54,15 +170,13 @@ function Sidebar() {
 
                 <div className="sidebar_header">
                     {/* IconButton component is a inbuild component in the material ui that frovied button like fitures */}
-                    {/* <IconButton > */}
-                    <Avatar src={user?.photoURL} onClick={() => signOut(auth)} />
-                    {/* </IconButton> */}
+                    <Avatar src={user?.photoURL} />
 
                     {/* classname sidebar_header_right this sidebar heder right part which contains alll icon */}
                     <div className="sidebar_header_right">
 
                         <IconButton >
-                            <DonutLargeIcon />
+                            <DonutLargeIcon onClick={() => signOut(auth)}/>
                         </IconButton>
 
                         <IconButton >
@@ -85,17 +199,22 @@ function Sidebar() {
                             </IconButton>
                         </label>
 
-                        <input type="text" id='search-input' placeholder='search & start a new chat' />
+                        <input type="text" id='search-input' placeholder='search & start a new chat' value={searchInputValue} onChange={(event) => setSearchInputValue(event.target.value)} />
                     </div>
                 </div>
 
                 <div className="sidebar_chats">
 
-                    {/* send props addNewChat and render 1st component is add new chat */}
-                    <SidebarChats addNewChat={true} />
-                    {/* <SidebarChats name="tushar" id="1234" /> // */}
+                    {searchItem.length > 0 ? searchItem : (<>
+                        {/* {isSearching ? (searchedUser.map((eachUser) => <SidebarChats key={eachUser.userUid} name={eachUser.name} id={eachUser.userUid} photoURL={eachUser.photoUrl} setIsSearching={setIsSearching} setSearchInputValue={setSearchInputValue} />)) : (<> */}
+                        {/* send props addNewChat and render 1st component is add new chat */}
+                        <SidebarChats addNewChat={true} />
 
-                    {rooms.map((room) => <SidebarChats key={room.id} name={room.name} id={room.id} />)}
+                        {rooms.map((room) => <SidebarChats key={room.id} name={room.name} id={room.id} />)}
+                        {friendListItem}
+                    </>)}
+
+
                 </div>
             </div>
         </>
