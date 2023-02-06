@@ -26,6 +26,7 @@ function Chat() {
     const [svgId, setSvgId] = useState("");
     const [{ user }, dispath] = useStateValue();
     const [searchParams, setSearchParams] = useSearchParams();
+    const chatBox=useRef(null);
     const [newFriend, setNewFriend] = useState({
         name: "",
         photoUrl: "",
@@ -112,7 +113,12 @@ function Chat() {
         }
     }, [roomId]); //here dependendency array used when roomId chsnge call the useeffect function
 
-
+useEffect(()=>{
+    chatBox.current.addEventListener("DOMNodeInserted", (event) => {
+        const { currentTarget: target } = event;
+        target.scroll({ top: target.scrollHeight, behavior: "smooth" });
+      });
+},[messageArray])
 
     //-----------------------------------------------------------------------
     //when we some messge enter in the messge input filled and enter butten click send Messge firred
@@ -234,7 +240,7 @@ function Chat() {
 
             {/* it is the chat body where messge shows */}
             {/* ------------------------------------------------------------------------------------------------------------------------------ */}
-            <div className="chat_body">
+            <div className="chat_body" ref={chatBox}>
 
                 {messageArray.map((eachMessageObj, index) => (
                     // senderUserUid: user.uid
