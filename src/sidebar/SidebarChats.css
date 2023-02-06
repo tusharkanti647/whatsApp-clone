@@ -35,3 +35,14 @@ a {
   text-decoration: none;
   color: black; /* this do after the adding colore change to blue and decoration add so it remove , here ancer tag is link tag */
 }
+
+.sidebar_chat > span{
+  
+  background-color: #25D366;
+  color: #FFFFFF;
+  padding: 4px;
+  font-size: 20px;
+  border-radius: 50%;
+  margin-left: auto;
+  margin-right: 3px;
+}

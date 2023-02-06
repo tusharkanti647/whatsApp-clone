@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-
 import { useParams, useSearchParams } from "react-router-dom";
 
 import "./Chat.css"
 import { db } from "../firebase";
 import { useStateValue } from "../StateProvider";
-import { signOut } from "firebase/auth";
-import { auth } from '../firebase';
+//import { signOut } from "firebase/auth";
+//import { auth } from '../firebase';
 
 import { Avatar, IconButton } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
@@ -25,16 +24,13 @@ function Chat() {
     const [inputMessage, setInputMessage] = useState("");
     const [messageArray, setMessageArray] = useState([]);
     const [svgId, setSvgId] = useState("");
+    const [{ user }, dispath] = useStateValue();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [newFriend, setNewFriend] = useState({
         name: "",
         photoUrl: "",
         userUid: "",
     });
-
-
-    const [{ user }, dispath] = useStateValue();
-
-    const [searchParams, setSearchParams] = useSearchParams();
 
     //useParams used to get the roomId , when roome is change
     const { roomId } = useParams();
@@ -49,7 +45,7 @@ function Chat() {
     useEffect(() => {
         setSvgId(Math.floor(Math.random() * 5000));
     }, []);
-
+    //creat the photo url
     if (group === "true") {
         profilePhotoUrl = `https://avatars.dicebear.com/api/human/${svgId}.svg`;
     } else {
@@ -82,10 +78,9 @@ function Chat() {
                     setMessageArray(newMessageArray);
                 })
             } else {
-                //console.log(roomId,newFriend);
                 //get the chating friend data from firbase
                 const getRoomData = onSnapshot(doc(db, "users", roomId), (doc) => {
-                    //console.log(doc.data());
+
                     setRoomName(doc.data().name);
                     setNewFriend({
                         name: doc.data().name,
@@ -96,16 +91,15 @@ function Chat() {
                 //------------------------------------------------------------------------------
 
 
-                //const n = newFriend.userUid;
                 //geat all messges of the newfriend
                 //get all the messge by the time odaring of time when change the roome or roomId
                 const q = query(collection(db, "chats", roomId, "messages"), orderBy("timestam", "asc"))//oder messge on timestamp and ascending oder give the asc
 
                 //set the each room messages in the newMessageArray
                 const getMessage = onSnapshot(q, (snapshot) => {
-                    //let newMessageArray = [];
                     let allMessages = snapshot.docs.map((doc) => doc.data());
 
+                    //filter the messge sender and resiver conversession messge
                     let newMessageArray = allMessages.filter((eachMessageObj) => (
                         eachMessageObj.senderUserUid === (user.uid || roomId) ||
                         eachMessageObj.receiverUserUid === (user.uid || roomId)
@@ -114,11 +108,7 @@ function Chat() {
                     //console.log(newMessageArray);
                     setMessageArray(newMessageArray);
                 })
-
-
-
             }
-
         }
     }, [roomId]); //here dependendency array used when roomId chsnge call the useeffect function
 
@@ -135,9 +125,9 @@ function Chat() {
             if (inputMessage === "") {
                 return;
             }
+            //-----------------------------------------------------------------------
 
             if (group === "true") {
-
                 try {
                     const sendData = await addDoc(collection(db, "rooms", roomId, "messages"), {
                         message: { inputMessage },
@@ -156,10 +146,11 @@ function Chat() {
                     senderUserUid: user.uid,
                     receiverUserUid: newFriend.userUid,
                     timestam: serverTimestamp(),
-                    //isSeen:"",
                     //timeStamp: firebase.firestore.Timestamp.now(),
                 };
 
+                //messge sdata set in firbase in chat collection      
+                //-----------------------------------------------------------------------
                 //messeage sender messge data
                 try {
                     const sendData = await addDoc(collection(db, "chats", newFriend.userUid, "messages"), {
@@ -180,6 +171,8 @@ function Chat() {
                     console.log("error", e);
                 }
 
+                //set the frind in firbase friendlist collection
+                //-----------------------------------------------------------------------
                 //added friend in sender friendList
                 try {
                     const sendData = await setDoc(doc(db, "Friendlist", user.uid, "list", newFriend.userUid), {
@@ -288,7 +281,7 @@ function Chat() {
                     <KeyboardVoiceIcon />
                 </IconButton>
                 <IconButton>
-                    {inputMessage.length>0 && <SendIcon />}
+                    {inputMessage.length > 0 && <SendIcon />}
                 </IconButton>
             </div>
         </div>

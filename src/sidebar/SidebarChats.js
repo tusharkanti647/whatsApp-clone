@@ -3,22 +3,26 @@ import "./SidebarChats.css"
 
 import { Avatar } from "@mui/material";
 
-import { collection, addDoc, orderBy, query, onSnapshot } from "firebase/firestore";
+import { collection, addDoc, orderBy, query, onSnapshot, setDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
 
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useStateValue } from "../StateProvider";
 //--------------------------------------------------------------------------------------
 
 function SidebarChats(props) {
+    //console.log(props);
     const { addNewChat, name, id, photoURL, setIsSearching, setSearchInputValue } = props;
     const [lastMessage, setLastMessage] = useState("");
     const [svgId, setSvgId] = useState("");
     const [messageCount, setMessageCount] = useState(0);
+    const [{ user }, dispath] = useStateValue();
+    const [finalfalseMessageArray, setFinalfalseMessageArray] = useState([]);
 
-    //console.log(props);
 
     let profilePhotoUrl = "";
     let linkToUrl = "";
+
     //--------------------------------------------------------------------------------
 
     //set the profile Photo Url and link To Url
@@ -53,16 +57,24 @@ function SidebarChats(props) {
 
                 const getMessage = onSnapshot(q, (snapshot) => {
 
-                    snapshot.docs.forEach((doc) => {
-                        //console.log(doc.data());
-                        if (doc.data().isSeen === "false") {
+                    let allMessages = [];
+                    snapshot.docs.forEach((doc) => allMessages.push({ id: doc.id, ...doc.data() }));
 
-                            //console.log(doc.data().message.inputMessage);
-                            // setMessageCount(messageCount + 1);
-                            //console.log(messageCount);
-                        }
-                        setLastMessage(doc.data().message.inputMessage)
-                    });
+                    //if(id===)
+                    //filter the messge sender and resiver conversession messge
+                    let newMessageArray = allMessages.filter((eachMessageObj) => (
+                        eachMessageObj.senderUserUid === (user.uid || id) ||
+                        eachMessageObj.receiverUserUid === (user.uid || id)
+                    ));
+
+                    let falseMessageArray = newMessageArray.filter((eachMessageObj) => (
+                        eachMessageObj.isSeen === "true"
+                    ))
+                    setFinalfalseMessageArray(falseMessageArray);;
+                    //console.log(finalfalseMessageArray);
+
+                    setLastMessage(newMessageArray[newMessageArray.length - 1].message.inputMessage);
+                    setMessageCount(falseMessageArray.length);
                 })
             }
         }
@@ -77,7 +89,6 @@ function SidebarChats(props) {
                 const docRef = await addDoc(collection(db, "rooms"), {
                     name: group,
                 });
-                //console.log("Document written with ID: ", docRef.id);
             } catch (e) {
                 console.error("Error adding document: ", e);
             }
@@ -88,8 +99,27 @@ function SidebarChats(props) {
 
     //searchreset this function clear the search input box,
     //and set the state of isSearch is false so that all other chatBar render
+    //set the all unseen message to seen
     //---------------------------------------------------------
     const searchReset = () => {
+
+        const changeChat = async (chatObj) => {
+            //console.log(chatObj);
+            if (chatObj) {
+                try {
+                    const docRef = await setDoc(doc(db, "chats", id, "messages", chatObj.id), {
+                        ...chatObj,
+                        isSeen: "false",
+                    });
+                } catch (e) {
+                    console.error("Error adding document: ", e);
+                }
+            }
+        }
+        finalfalseMessageArray.map((eachMessageObj) => changeChat(eachMessageObj));
+
+
+
         if (!photoURL) {
             return;
         }
@@ -107,8 +137,7 @@ function SidebarChats(props) {
                         <h2>{name}</h2>
                         <p>{lastMessage}</p>
                     </div>
-                    {/* <span>{}</span> */}
-                    {/* {console.log("hi")} */}
+                    {messageCount > 0 ? <span>{messageCount}</span> : ""}
                 </div>
             </Link>
         ) : (

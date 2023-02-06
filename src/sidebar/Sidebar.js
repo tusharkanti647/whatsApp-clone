@@ -119,8 +119,8 @@ function Sidebar() {
     });
 
 
-     //---------------------------------------------------------------------------------------
-     const friendListItem = friendList.map((eachUser) => {
+    //---------------------------------------------------------------------------------------
+    const friendListItem = friendList.map((eachUser) => {
         return (
             <SidebarChats
                 key={eachUser.userUid}
@@ -133,36 +133,8 @@ function Sidebar() {
         );
     });
     //---------------------------------------------------------------------------------------
-    // const searchHandel = (event) => {
-    //     setIsSearching(true);
-    //     if (event.target.value === "") {
-    //         setIsSearching(false);
-    //     }
 
-    //     setSearchInputValue(event.target.value);
-    //     //console.log(event.target.value);
 
-    //     const usersRef = collection(db, "users");
-    //     // Create a query against the collection.
-    //     const q = query(usersRef, where("name", "==", event.target.value));
-
-    //     if (event.target.value === user.displayName) {
-    //         return;
-    //     }
-    //     //console.log(q);
-    //     const getMessage = onSnapshot(q, (snapshot) => {
-    //         const newSearchResultUsersArray = []
-    //         snapshot.docs.forEach((doc) => {
-    //             newSearchResultUsersArray.push(doc.data());
-    //         });
-
-    //         setSearchResultUsers(newSearchResultUsersArray);
-    //     });
-    // }
-    //console.log(searchResultUsers);
-    //console.log(!searchResultUsers);
-
-    //---------------------------------------------------------------------------------------------
     return (
         <>
             {/* className sidebar is the main containar in left side div */}
@@ -176,7 +148,7 @@ function Sidebar() {
                     <div className="sidebar_header_right">
 
                         <IconButton >
-                            <DonutLargeIcon onClick={() => signOut(auth)}/>
+                            <DonutLargeIcon onClick={() => signOut(auth)} />
                         </IconButton>
 
                         <IconButton >
@@ -206,14 +178,12 @@ function Sidebar() {
                 <div className="sidebar_chats">
 
                     {searchItem.length > 0 ? searchItem : (<>
-                        {/* {isSearching ? (searchedUser.map((eachUser) => <SidebarChats key={eachUser.userUid} name={eachUser.name} id={eachUser.userUid} photoURL={eachUser.photoUrl} setIsSearching={setIsSearching} setSearchInputValue={setSearchInputValue} />)) : (<> */}
                         {/* send props addNewChat and render 1st component is add new chat */}
                         <SidebarChats addNewChat={true} />
 
                         {rooms.map((room) => <SidebarChats key={room.id} name={room.name} id={room.id} />)}
                         {friendListItem}
                     </>)}
-
 
                 </div>
             </div>

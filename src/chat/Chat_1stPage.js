@@ -14,7 +14,7 @@ function Chat_1stpage() {
                 <img className="Chat_1stPagePhoto" src={img} />
                 <h1 className="chat-1st-page-header">WhatsApp Web</h1>
 
-                
+
                 <p>Send and receive messages without keeping your phone online.
                     <br />
                     Use WhatsApp on up to 4 linked devices and 1 phone at the same time.</p>
